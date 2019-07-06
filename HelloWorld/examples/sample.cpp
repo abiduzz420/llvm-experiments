@@ -3,6 +3,6 @@
 using namespace std;
 
 int main() {
-	printf("Hello LLVM\n");
+	cout << "Hello LLVM" << endl;
 	return 0;
 }
