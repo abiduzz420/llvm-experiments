@@ -16,6 +16,7 @@
 #include "llvm/IR/Function.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/IR/CFG.h"
 #include<bits/stdc++.h>
 using namespace llvm;
 
@@ -114,3 +115,47 @@ char InstrStats::ID = 0;
 static RegisterPass<InstrStats> 
 Z("instats", "Max & Min instructions in BB Pass (with getAnalysisUsage implemented)");
 
+namespace {
+  struct BlockStats : public FunctionPass {
+    static char ID;
+    BlockStats() : FunctionPass(ID) {}
+
+    bool runOnFunction(Function &F) override {
+      unsigned int maxPreds = 0, minPreds = 0;
+      unsigned int maxSucs = 0, minSucs = 0;
+      for(BasicBlock &bb : F) {
+        unsigned int predCount = 0, sucCount = 0;
+        for(BasicBlock *Pred : predecessors(&bb)) {
+          ++predCount;
+        }
+        for(BasicBlock *Succ : successors(&bb)) {
+          ++sucCount;
+        }
+
+        if(maxPreds == 0 || predCount > maxPreds) maxPreds = predCount;
+        if(minPreds == 0 || predCount < minPreds) minPreds = predCount;
+        if(maxSucs == 0 || sucCount > maxSucs) maxSucs = sucCount;
+        if(minSucs == 0 || sucCount < minSucs) minSucs = sucCount;
+
+      }
+      errs().write_escaped(F.getName()) << "\nPredecessors stats: "  
+             << "MAX COUNT: " << maxPreds << "\t"
+             << "MIN COUNT: " << minPreds << "\n";
+
+      errs() << "Successors stats: " << "MAX COUNT: " << maxSucs << "\t"
+                                     << "MIN COUNT: " << minSucs << "\n";
+      errs() << "---------------------------------------------------------------\n";
+      return false;
+    }
+
+    void getAnalysisUsage(AnalysisUsage &AU) const override {
+      AU.setPreservesAll();
+    }
+
+  };
+
+}
+
+char BlockStats :: ID = 0;
+static RegisterPass<BlockStats>
+A("blockstats", "Block with max/min predecessors");
