@@ -23,6 +23,8 @@ target triple = "x86_64-unknown-linux-gnu"
 @_ZStL8__ioinit = internal global %"class.std::ios_base::Init" zeroinitializer, align 1
 @_ZSt4cout = external dso_local global %"class.std::basic_ostream", align 8
 @.str = private unnamed_addr constant [24 x i8] c"Addition of 3 and 1 is \00", align 1
+@.str.1 = private unnamed_addr constant [10 x i8] c"y is even\00", align 1
+@.str.2 = private unnamed_addr constant [9 x i8] c"y is odd\00", align 1
 @llvm.global_ctors = appending global [1 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* @_GLOBAL__sub_I_loops.cpp, i8* null }]
 
 ; Function Attrs: noinline uwtable
@@ -79,15 +81,106 @@ define dso_local i32 @_Z7addFuncii(i32, i32) #4 {
   ret i32 %7
 }
 
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local i32 @_Z9factoriali(i32) #4 {
+  %2 = alloca i32, align 4
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  store i32 %0, i32* %2, align 4
+  store i32 1, i32* %3, align 4
+  store i32 1, i32* %4, align 4
+  br label %5
+
+; <label>:5:                                      ; preds = %9, %1
+  %6 = load i32, i32* %4, align 4
+  %7 = load i32, i32* %2, align 4
+  %8 = icmp ne i32 %6, %7
+  br i1 %8, label %9, label %15
+
+; <label>:9:                                      ; preds = %5
+  %10 = load i32, i32* %3, align 4
+  %11 = load i32, i32* %4, align 4
+  %12 = mul nsw i32 %10, %11
+  store i32 %12, i32* %3, align 4
+  %13 = load i32, i32* %4, align 4
+  %14 = add nsw i32 %13, 1
+  store i32 %14, i32* %4, align 4
+  br label %5
+
+; <label>:15:                                     ; preds = %5
+  %16 = load i32, i32* %3, align 4
+  ret i32 %16
+}
+
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local i32 @_Z8doubleIti(i32) #4 {
+  %2 = alloca i32, align 4
+  store i32 %0, i32* %2, align 4
+  %3 = load i32, i32* %2, align 4
+  %4 = mul nsw i32 %3, 2
+  ret i32 %4
+}
+
 ; Function Attrs: noinline norecurse optnone uwtable
 define dso_local i32 @main() #5 {
   %1 = alloca i32, align 4
+  %2 = alloca i32, align 4
+  %3 = alloca i32, align 4
   store i32 0, i32* %1, align 4
-  %2 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* dereferenceable(272) @_ZSt4cout, i8* getelementptr inbounds ([24 x i8], [24 x i8]* @.str, i32 0, i32 0))
-  %3 = call i32 @_Z7addFuncii(i32 3, i32 1)
-  %4 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSolsEi(%"class.std::basic_ostream"* %2, i32 %3)
-  %5 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSolsEPFRSoS_E(%"class.std::basic_ostream"* %4, %"class.std::basic_ostream"* (%"class.std::basic_ostream"*)* @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)
+  %4 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* dereferenceable(272) @_ZSt4cout, i8* getelementptr inbounds ([24 x i8], [24 x i8]* @.str, i32 0, i32 0))
+  %5 = call i32 @_Z7addFuncii(i32 3, i32 1)
+  %6 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSolsEi(%"class.std::basic_ostream"* %4, i32 %5)
+  %7 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSolsEPFRSoS_E(%"class.std::basic_ostream"* %6, %"class.std::basic_ostream"* (%"class.std::basic_ostream"*)* @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)
   call void @_Z9countDownv()
+  store i32 3, i32* %2, align 4
+  br label %8
+
+; <label>:8:                                      ; preds = %31, %0
+  %9 = load i32, i32* %2, align 4
+  %10 = icmp slt i32 %9, 10
+  br i1 %10, label %11, label %34
+
+; <label>:11:                                     ; preds = %8
+  %12 = load i32, i32* %2, align 4
+  %13 = srem i32 %12, 2
+  %14 = icmp eq i32 %13, 0
+  br i1 %14, label %15, label %18
+
+; <label>:15:                                     ; preds = %11
+  %16 = load i32, i32* %2, align 4
+  %17 = call i32 @_Z8doubleIti(i32 %16)
+  store i32 %17, i32* %3, align 4
+  br label %21
+
+; <label>:18:                                     ; preds = %11
+  %19 = load i32, i32* %2, align 4
+  %20 = call i32 @_Z9factoriali(i32 %19)
+  store i32 %20, i32* %3, align 4
+  br label %21
+
+; <label>:21:                                     ; preds = %18, %15
+  %22 = load i32, i32* %3, align 4
+  %23 = srem i32 %22, 2
+  %24 = icmp eq i32 %23, 0
+  br i1 %24, label %25, label %28
+
+; <label>:25:                                     ; preds = %21
+  %26 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* dereferenceable(272) @_ZSt4cout, i8* getelementptr inbounds ([10 x i8], [10 x i8]* @.str.1, i32 0, i32 0))
+  %27 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSolsEPFRSoS_E(%"class.std::basic_ostream"* %26, %"class.std::basic_ostream"* (%"class.std::basic_ostream"*)* @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)
+  br label %31
+
+; <label>:28:                                     ; preds = %21
+  %29 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* dereferenceable(272) @_ZSt4cout, i8* getelementptr inbounds ([9 x i8], [9 x i8]* @.str.2, i32 0, i32 0))
+  %30 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSolsEPFRSoS_E(%"class.std::basic_ostream"* %29, %"class.std::basic_ostream"* (%"class.std::basic_ostream"*)* @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)
+  br label %31
+
+; <label>:31:                                     ; preds = %28, %25
+  %32 = load i32, i32* %2, align 4
+  %33 = add nsw i32 %32, 1
+  store i32 %33, i32* %2, align 4
+  br label %8
+
+; <label>:34:                                     ; preds = %8
   ret i32 0
 }
 

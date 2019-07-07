@@ -16,6 +16,7 @@
 #include "llvm/IR/Function.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/raw_ostream.h"
+#include<bits/stdc++.h>
 using namespace llvm;
 
 #define DEBUG_TYPE "hello"
@@ -71,3 +72,45 @@ namespace {
 char Hello2::ID = 0;
 static RegisterPass<Hello2>
 Y("hello2", "Hello World Pass (with getAnalysisUsage implemented)");
+
+namespace {
+  struct InstrStats : public FunctionPass {
+    static char ID;
+    InstrStats() : FunctionPass(ID) {}
+
+    bool runOnFunction(Function &F) override {
+      unsigned int blockCounter = 0;
+      unsigned int maxInstBlockCounter = 0;
+      unsigned int minInstBlockCounter = 0;
+      for (BasicBlock &bb : F) {
+        ++blockCounter;
+        unsigned int instrCounter = 0;
+        for (Instruction &i : bb) {
+          ++instrCounter;
+        }
+        if (maxInstBlockCounter == 0 || instrCounter > maxInstBlockCounter) {
+          maxInstBlockCounter = instrCounter;
+        }
+        if (minInstBlockCounter == 0 || instrCounter < minInstBlockCounter) {
+          minInstBlockCounter = instrCounter;
+        }
+        errs() << "No of instructions are " << instrCounter << " in basicBlock " << blockCounter << "\n"; 
+      }
+      errs() << "Total no of Block are " << blockCounter << "\n";
+      errs() << "Instruction Stats from ";
+      errs().write_escaped(F.getName()) << "\n Max instructions: " << maxInstBlockCounter
+                                        << ",  Min instructions: " << minInstBlockCounter << "\n";
+      errs() << "--------------------------------------------------------------\n";
+      return false;
+    }
+
+    void getAnalysisUsage(AnalysisUsage &AU) const override {
+      AU.setPreservesAll();
+    }
+  };
+}
+
+char InstrStats::ID = 0;
+static RegisterPass<InstrStats> 
+Z("instats", "Max & Min instructions in BB Pass (with getAnalysisUsage implemented)");
+
