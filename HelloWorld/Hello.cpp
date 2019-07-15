@@ -14,10 +14,11 @@
 
 #include "llvm/ADT/Statistic.h"
 #include "llvm/IR/Function.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Value.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/CFG.h"
-#include<bits/stdc++.h>
 using namespace llvm;
 
 #define DEBUG_TYPE "hello"
@@ -138,7 +139,7 @@ namespace {
         if(minSucs == 0 || sucCount < minSucs) minSucs = sucCount;
 
       }
-      errs().write_escaped(F.getName()) << "\nPredecessors stats: "  
+      errs().write_escaped(F.getName()) << "\nPredecessors stats: "
              << "MAX COUNT: " << maxPreds << "\t"
              << "MIN COUNT: " << minPreds << "\n";
 
@@ -159,3 +160,32 @@ namespace {
 char BlockStats :: ID = 0;
 static RegisterPass<BlockStats>
 A("blockstats", "Block with max/min predecessors");
+
+// Find the field accessed maxiumum number of times
+namespace {
+  struct StructStats : public ModulePass {
+    static char ID;
+    StructStats() : ModulePass(ID) {}
+
+    bool runOnModule(Module &M) {
+      for(Function &F : M.functions()) {
+        for(BasicBlock &bb : F) {
+          for(BasicBlock::iterator i = bb.begin(), e=bb.end(); i != e; ++i) {
+            Instruction* instr = dyn_cast<Instruction>(i);
+            if(instr->getOpcode() == Instruction::GetElementPtr) {
+              errs() <<  instr->getOpcodeName() << "\n";
+              // for(Value* operand : instr->operands()) {
+              //   errs() << operand->getValueName() << "\n";
+              // }
+            }
+          }
+        }
+      }
+      return false;
+    }
+  };
+}
+
+char StructStats :: ID = 0;
+static RegisterPass<StructStats>
+B("structstats", "Struct field access max times");
