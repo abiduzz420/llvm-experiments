@@ -16,6 +16,7 @@
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Value.h"
+#include "llvm/IR/Instructions.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/CFG.h"
@@ -172,11 +173,24 @@ namespace {
         for(BasicBlock &bb : F) {
           for(BasicBlock::iterator i = bb.begin(), e=bb.end(); i != e; ++i) {
             Instruction* instr = dyn_cast<Instruction>(i);
-            if(instr->getOpcode() == Instruction::GetElementPtr) {
-              errs() <<  instr->getOpcodeName() << "\n";
-              // for(Value* operand : instr->operands()) {
-              //   errs() << operand->getValueName() << "\n";
-              // }
+            auto &GEPInst = cast<GetElementPtrInst>(*instr);
+            if(instr->getOpcode() == Instruction::GetElementPtr
+            && GEPInst.isInBounds()
+            && GEPInst.getSourceElementType()->isStructTy()) 
+            {
+              // cherry picked getelementptr instruction
+              errs() << instr->getOpcodeName() << "\n";
+              for(unsigned i=0, e=instr->getNumOperands(); i != e; ++i) {
+                errs() << instr-> getOperand(i)->getNumUses() << "\t";
+                /*
+                  Sample Output: 0x55bae12bb408	0x55bae12bb3c0	0x55bae12bb3c0
+                                      i=0          i=1             i=2
+                  i=0 refers to struct variable or instance which is accessed
+                  i=1 refers to the struct name that is being accessed
+                  i=2 refers to field accessed                          
+                 */
+              }
+              errs() << "\n";
             }
           }
         }
