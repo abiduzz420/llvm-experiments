@@ -41,7 +41,6 @@ namespace {
     }
 
     bool runOnModule(Module &M) {
-    	static LLVMContext &Context = getGlobalContext();
     	static IRBuilder<> Builder(Context);
    		GlobalVariable *gVar = createGlob(M, Builder, "GlobVar");
    		return true;
